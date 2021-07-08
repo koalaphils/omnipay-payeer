@@ -6,73 +6,70 @@ use Omnipay\Common\Message\AbstractRequest as OmnipayRequest;
 
 abstract class AbstractRequest extends OmnipayRequest
 {
-    protected $liveMerchantEndpoint = '//payeer.com/api/merchant/m.php';
-
-    protected $liveApiEndpoint = 'https://payeer.com/ajax/api/api.php';
+    protected $liveMerchantEndpoint = 'https://payeer.com/merchant/';
 
     protected function getMerchantEndpoint()
     {
         return $this->liveMerchantEndpoint;
     }
 
-    public function getAccount()
+    public function getMerchantId()
     {
-        return $this->getParameter('account');
+        return $this->getParameter('merchantId');
     }
 
-    public function setAccount($value)
+    public function setMerchantId($value)
     {
-        return $this->setParameter('account', $value);
+        return $this->setParameter('merchantId', $value);
     }
 
-    public function getShopId()
+    public function getMerchantKey()
     {
-        return $this->getParameter('shop_id');
+        return $this->getParameter('merchantKey');
     }
 
-    public function setShopId($value)
+    public function setMerchantKey($value)
     {
-        return $this->setParameter('shop_id', $value);
+        return $this->setParameter('merchantKey', $value);
     }
 
-    public function getShopSecret()
+    public function getMerchantParameterKey()
     {
-        return $this->getParameter('shop_secret');
+        return $this->getParameter('merchantParameterKey');
     }
 
-    public function setShopSecret($value)
+    public function setMerchantParameterKey($value)
     {
-        return $this->setParameter('shop_secret', $value);
+        return $this->setParameter('merchantParameterKey', $value);
     }
 
-    public function getApiId()
+    public function getTransactionDetails()
     {
-        return $this->getParameter('api_id');
+        return $this->getParameter('transaction');
     }
 
-    public function setApiId($value)
+    public function setTransactionDetails($value)
     {
-        return $this->setParameter('api_id', $value);
+        $this->setParameter('transaction', $value);
     }
 
-    public function getApiSecret()
-    {
-        return $this->getParameter('api_secret');
+    public function getParameterEncryptionKey(){
+        return $this->getParameter('merchantParameterKey');
     }
 
-    public function setApiSecret($value)
-    {
-        return $this->setParameter('api_secret', $value);
+    public function setParameterEncryptionKey($value){
+        $this->setParameter('merchantParameterKey', $value);
     }
 
-    public function getPayeeAccount()
+    protected function encryptParameters($payload)
     {
-        return $this->getParameter('payeeAccount');
+        $key = hash('md5', $this->getParameterEncryptionKey() . $this->getTransactionId());
+        return @base64_encode(openssl_encrypt(json_encode($payload), 'AES-256-CBC', $key, OPENSSL_RAW_DATA));
     }
 
-    public function setPayeeAccount($value)
-    {
-        return $this->setParameter('payeeAccount', $value);
+    protected function decryptParameters(string $m_params){
+        $decoded = base64_decode($m_params);
+        $key = hash('md5', $this->getParameterEncryptionKey() . $this->getTransactionId());
+        return @json_decode(openssl_decrypt($decoded, 'AES-256-CBC', $key, OPENSSL_RAW_DATA), true);
     }
-
 }

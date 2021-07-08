@@ -16,7 +16,7 @@ class CompletePurchaseRequest extends AbstractRequest
             throw new InvalidResponseException("Invalid m_status:".$this->httpRequest->request->get('m_status'));
         }
 
-        $arHash = [
+        $arHash = array_filter([
             $this->httpRequest->request->get('m_operation_id'),
             $this->httpRequest->request->get('m_operation_ps'),
             $this->httpRequest->request->get('m_operation_date'),
@@ -27,8 +27,9 @@ class CompletePurchaseRequest extends AbstractRequest
             $this->httpRequest->request->get('m_curr'),
             $this->httpRequest->request->get('m_desc'),
             $this->httpRequest->request->get('m_status'),
-            $this->getShopSecret(),
-        ];
+            $this->httpRequest->request->get('m_params'),
+            $this->getMerchantKey(),
+        ]);
         $sign_hash = strtoupper(hash('sha256', implode(':', $arHash)));
 
         if ($this->httpRequest->request->get('m_sign') != $sign_hash) {
@@ -43,5 +44,14 @@ class CompletePurchaseRequest extends AbstractRequest
     public function sendData($data)
     {
         return $this->response = new CompletePurchaseResponse($this, $data);
+    }
+
+    public function getTransactionDetails()
+    {
+        $arParams = $this->decryptParameters($this->httpRequest->request->get('m_params'));
+        $details =  json_decode(bzdecompress(base64_decode($arParams['reference']['details'])), true);
+        $this->setTransactionDetails($details);
+
+        return parent::getTransactionDetails();
     }
 }

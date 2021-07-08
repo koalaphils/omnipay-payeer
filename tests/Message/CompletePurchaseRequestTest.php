@@ -29,7 +29,7 @@ class CompletePurchaseRequestTest extends TestCase
 
         $request = new CompletePurchaseRequest($this->getHttpClient(), $httpRequest);
         $request->setCurrency('USD');
-        $request->setShopSecret('secret');
+        $request->setMerchantKey('secret');
         $response = $request->send();
         $this->assertTrue($response->isSuccessful());
         $this->assertEquals('16088', $response->getTransactionId());

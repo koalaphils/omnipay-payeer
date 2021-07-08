@@ -3,6 +3,8 @@
 namespace Omnipay\Payeer;
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Payeer\Message\CompletePurchaseRequest;
+use Omnipay\Payeer\Message\PurchaseRequest;
 
 /**
  * Gateway Class
@@ -14,79 +16,52 @@ class Gateway extends AbstractGateway
         return 'Payeer';
     }
 
-    public function getAccount()
+    public function getMerchantId()
     {
-        return $this->getParameter('account');
+        return $this->getParameter('merchantId');
     }
 
-    public function setAccount($value)
+    public function setMerchantId($value)
     {
-        return $this->setParameter('account', $value);
+        return $this->setParameter('merchantId', $value);
     }
 
-    public function getApiId()
+    public function getMerchantKey()
     {
-        return $this->getParameter('api_id');
+        return $this->getParameter('merchantKey');
     }
 
-    public function setApiId($value)
+    public function setMerchantKey($value)
     {
-        return $this->setParameter('api_id', $value);
+        return $this->setParameter('merchantKey', $value);
     }
 
-    public function getApiSecret()
+    public function getMerchantParameterKey()
     {
-        return $this->getParameter('api_secret');
+        return $this->getParameter('merchantParameterKey');
     }
 
-    public function setApiSecret($value)
+    public function setMerchantParameterKey($value)
     {
-        return $this->setParameter('api_secret', $value);
-    }
-
-    public function getShopId()
-    {
-        return $this->getParameter('shop_id');
-    }
-
-    public function setShopId($value)
-    {
-        return $this->setParameter('shop_id', $value);
-    }
-
-    public function getShopSecret()
-    {
-        return $this->getParameter('shop_secret');
-    }
-
-    public function setShopSecret($value)
-    {
-        return $this->setParameter('shop_secret', $value);
+        return $this->setParameter('merchantParameterKey', $value);
     }
 
     public function getDefaultParameters()
     {
         return array(
-            'account' => '',
-            'api_id' => '',
-            'api_secret' => '',
-            'shop_id' => '',
-            'shop_secret' => '',
+            'merchantId' => '',
+            'merchantKey' => '',
+            'merchantParameterKey' => '',
         );
     }
 
     public function purchase(array $parameters = array())
     {
-        return $this->createRequest('\Omnipay\Payeer\Message\PurchaseRequest', $parameters);
+        return $this->createRequest(PurchaseRequest::class, $parameters);
     }
 
     public function completePurchase(array $parameters = array())
     {
-        return $this->createRequest('\Omnipay\Payeer\Message\CompletePurchaseRequest', $parameters);
-    }
-
-    public function refund(array $parameters = array())
-    {
-        return $this->createRequest('\Omnipay\Payeer\Message\RefundRequest', $parameters);
+        return $this->createRequest(CompletePurchaseRequest::class, $parameters);
     }
 }
